@@ -1,0 +1,11 @@
+.idea
+tmp
+node_modules
+coverage
+__tests__
+src
+dist
+lib
+example
+build
+.pdf
