@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>loshiReport test</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+	<script src="../dist/loshi-report.0.0.1.js"></script>
+	<script>
+        loshiReport
+            .init({
+                reportApi:'http://some.com/api',
+            })
+            .addData((data)=>{
+                data.name = 'wangwei'
+                data.some = {
+                    name:'wangwie',
+                    age:20
+                }
+		    })
+
+
+	</script>
+	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+	<div>
+        <h1>loshiReport test</h1>
+
+		<ul>
+			<li>1</li>
+			<li>2</li>
+			<li>3</li>
+			<li>4</li>
+			<li>5</li>
+		</ul>
+
+		<img src="http://idsfafsadf">
+		<img src="http://image.uczzd.cn/3238272118782049804.jpg?id=0&from=export&height=140&width=270" id="img1">
+	</div>
+	<script>
+		$(function(){
+
+			$.ajax({
+				type:'get',
+				url:'http://mock-api.seosiwei.com/guest/home/api/shop/getHomeInitInf',
+				success:data=>{
+					// console.log(data)
+				}
+			})
+
+			// fetch('http://mock-api.seosiwei.com/guest/order/api/order/getOrde',{
+			// 	method: 'POST',
+			// }).then(function(response){
+			// 	console.log('++++')
+			// })
+
+			// var req = new Request('http://mock-api.seosiwei.com/guest/home/api/shop/getHomeInitInfo', {method: 'GET', cache: 'reload'});
+			// fetch(req).then(function(response){
+			// 	console.log('-----')
+			// })
+
+			$.ajax({
+				type:'post',
+				url:'http://mock-api.seosiwei.com/guest/order/api/order/getOrder',
+				success:data=>{
+					// console.log(data)
+				}
+			})
+		})
+
+
+	</script>
+</body>
+</html>
+
+

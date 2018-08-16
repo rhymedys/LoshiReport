@@ -2,13 +2,13 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-15 16:23:33
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-15 18:12:53
+ * @Last Modified time: 2018-08-16 10:26:08
  */
 let errorList = []
 let addData = {}
 let opt = {
   // 上报地址
-  domain: 'http://localhost/api',
+  reportApi: 'http://localhost/api',
   // 脚本延迟上报时间
   outtime: 1000,
   // ajax请求时需要过滤的url信息
@@ -85,6 +85,7 @@ function getLargeTime () {
     console.log(`loadTime:${loadTime}`)
     reportData()
   }
+
 }
 
 // ajax重写
@@ -163,10 +164,10 @@ function reportData () {
     // console.log(JSON.stringify(result))
     checkIsFunction(callBack) && callBack(result)
     if (!callBack && window.fetch) {
-      window.fetch(opt.domain, {
+      window.fetch(opt.reportApi, {
         method: 'POST',
         type: 'report-data',
-        body: JSON.stringify(result)
+        body: JSON.stringify(result),
       })
     }
   }, opt.outtime)
@@ -229,6 +230,7 @@ function clear () {
 function initErrorInterceptor () {
   // img,script,css,jsonp
   window.addEventListener('error', function (e) {
+    console.log('window error listener',e)
     let defaults = Object.assign({}, errordefo)
     defaults.n = 'resource'
     defaults.t = new Date().getTime()
@@ -243,17 +245,18 @@ function initErrorInterceptor () {
   }, true)
   // js
   window.onerror = function (msg, resourceUrl, line, col, error) {
+    console.log('window onerror',msg, resourceUrl, line, col, error)
     let defaults = Object.assign({}, errordefo)
     setTimeout(() => {
       col = col || (window.event && window.event.errorCharacter) || 0
       defaults.msg = error && error.stack ? error.stack.toString() : msg
       defaults.method = 'GET'
+      defaults.t = new Date().getTime()
       defaults.data = {
         resourceUrl,
         line,
         col
       }
-      defaults.t = new Date().getTime()
       conf.errorList.push(defaults)
     }, 0)
   }
@@ -326,17 +329,23 @@ function attachLoadEventListener () {
 }
 
 class Report {
-  constructor (options, cb) {
+  constructor () {
+    window.loshiReport = this
+    return this
+  }
+
+
+  init(options,cb){
     opt = Object.assign(opt, options)
     callBack = cb
-
+  
     if (opt.isError) initErrorInterceptor()
-
+  
     attachLoadEventListener()
-
+  
     if (opt.isResource || opt.isError) initAjaxInterceptor()
 
-    window.loshiReport = this
+    return this
   }
 
   addError (err) {
@@ -353,6 +362,8 @@ class Report {
       }
       errorList.push(errObj)
     }
+
+    return this
   }
 
   addData (cb) {
