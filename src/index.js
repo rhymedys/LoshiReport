@@ -2,7 +2,7 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-15 16:23:33
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-16 10:26:08
+ * @Last Modified time: 2018-08-16 11:11:02
  */
 let errorList = []
 let addData = {}
@@ -329,12 +329,8 @@ function attachLoadEventListener () {
 }
 
 class Report {
-  constructor () {
-    window.loshiReport = this
-    return this
-  }
 
-
+  
   init(options,cb){
     opt = Object.assign(opt, options)
     callBack = cb

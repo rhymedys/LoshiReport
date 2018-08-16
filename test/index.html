@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 	<script src="../dist/loshi-report.0.0.1.js"></script>
 	<script>
-        loshiReport
+        LoshiReport
             .init({
                 reportApi:'http://some.com/api',
             })
@@ -38,6 +38,19 @@
 		<img src="http://image.uczzd.cn/3238272118782049804.jpg?id=0&from=export&height=140&width=270" id="img1">
 	</div>
 	<script>
+
+  
+const object1 = {
+  property1: 42
+};
+ 
+const object2 = Object.freeze(object1);
+ 
+object2.property1 = 33;
+// Throws an error in strict mode
+ 
+console.log(object2.property1);
+
 		$(function(){
 
 			$.ajax({
@@ -65,9 +78,13 @@
 				success:data=>{
 					// console.log(data)
 				}
-			})
+            })
+
 		})
 
+            
+
+        console.log(fafsdfsdfasfd)
 
 	</script>
 </body>

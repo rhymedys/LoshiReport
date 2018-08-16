@@ -2,7 +2,7 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-15 16:08:14
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-15 17:21:22
+ * @Last Modified time: 2018-08-16 10:42:40
  */
 
 'use strict'
@@ -18,7 +18,7 @@ export default {
     file: `dist/loshi-report.${packageInfo.version}.js`,
     format: 'umd'
   },
-  name: packageInfo.name,
+  name: 'LoshiReport',
   plugins: [
     commonjs(), // 将CommonJS模块转换成ES6;
     babel({
