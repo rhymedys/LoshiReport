@@ -7,18 +7,12 @@
 	<script src="../dist/loshi-report.0.0.1.js"></script>
 	<script>
         LoshiReport
-            .init({
-                reportApi:'http://some.com/api',
-            })
-            .addData((data)=>{
-                data.name = 'wangwei'
-                data.some = {
-                    name:'wangwie',
-                    age:20
-                }
+          .init({
+            reportApi: 'http://some.com/api'
+          })
+          .addData((data) => {
+    				data.appId = 123215456
 		    })
-
-
 	</script>
 	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 </head>
@@ -38,54 +32,36 @@
 		<img src="http://image.uczzd.cn/3238272118782049804.jpg?id=0&from=export&height=140&width=270" id="img1">
 	</div>
 	<script>
+		$(function () {
+		  $.ajax({
+		    type: 'get',
+		    url: 'http://mock-api.seosiwei.com/guest/home/api/shop/getHomeInitInf',
+		    success: data => {
+		      // console.log(data)
+		    }
+		  })
 
-  
-const object1 = {
-  property1: 42
-};
- 
-const object2 = Object.freeze(object1);
- 
-object2.property1 = 33;
-// Throws an error in strict mode
- 
-console.log(object2.property1);
+		  // fetch('http://mock-api.seosiwei.com/guest/order/api/order/getOrde',{
+		  // 	method: 'POST',
+		  // }).then(function(response){
+		  // 	console.log('++++')
+		  // })
 
-		$(function(){
+		  // var req = new Request('http://mock-api.seosiwei.com/guest/home/api/shop/getHomeInitInfo', {method: 'GET', cache: 'reload'});
+		  // fetch(req).then(function(response){
+		  // 	console.log('-----')
+		  // })
 
-			$.ajax({
-				type:'get',
-				url:'http://mock-api.seosiwei.com/guest/home/api/shop/getHomeInitInf',
-				success:data=>{
-					// console.log(data)
-				}
-			})
-
-			// fetch('http://mock-api.seosiwei.com/guest/order/api/order/getOrde',{
-			// 	method: 'POST',
-			// }).then(function(response){
-			// 	console.log('++++')
-			// })
-
-			// var req = new Request('http://mock-api.seosiwei.com/guest/home/api/shop/getHomeInitInfo', {method: 'GET', cache: 'reload'});
-			// fetch(req).then(function(response){
-			// 	console.log('-----')
-			// })
-
-			$.ajax({
-				type:'post',
-				url:'http://mock-api.seosiwei.com/guest/order/api/order/getOrder',
-				success:data=>{
-					// console.log(data)
-				}
-            })
-
+		  $.ajax({
+		    type: 'post',
+		    url: 'http://mock-api.seosiwei.com/guest/order/api/order/getOrder',
+		    success: data => {
+		      // console.log(data)
+		    }
+  })
 		})
 
-            
-
-        console.log(fafsdfsdfasfd)
-
+console.log(fafsdfsdfasfd)
 	</script>
 </body>
 </html>

@@ -2,7 +2,7 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-15 16:23:33
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-16 11:11:02
+ * @Last Modified time: 2018-08-17 13:59:27
  */
 let errorList = []
 let addData = {}
@@ -85,7 +85,6 @@ function getLargeTime () {
     console.log(`loadTime:${loadTime}`)
     reportData()
   }
-
 }
 
 // ajax重写
@@ -166,8 +165,12 @@ function reportData () {
     if (!callBack && window.fetch) {
       window.fetch(opt.reportApi, {
         method: 'POST',
-        type: 'report-data',
-        body: JSON.stringify(result),
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        // type: 'report-data',
+        body: JSON.stringify(result)
       })
     }
   }, opt.outtime)
@@ -230,7 +233,7 @@ function clear () {
 function initErrorInterceptor () {
   // img,script,css,jsonp
   window.addEventListener('error', function (e) {
-    console.log('window error listener',e)
+    console.log('window error listener', e)
     let defaults = Object.assign({}, errordefo)
     defaults.n = 'resource'
     defaults.t = new Date().getTime()
@@ -245,7 +248,7 @@ function initErrorInterceptor () {
   }, true)
   // js
   window.onerror = function (msg, resourceUrl, line, col, error) {
-    console.log('window onerror',msg, resourceUrl, line, col, error)
+    console.log('window onerror', msg, resourceUrl, line, col, error)
     let defaults = Object.assign({}, errordefo)
     setTimeout(() => {
       col = col || (window.event && window.event.errorCharacter) || 0
@@ -329,16 +332,14 @@ function attachLoadEventListener () {
 }
 
 class Report {
-
-  
-  init(options,cb){
+  init (options, cb) {
     opt = Object.assign(opt, options)
     callBack = cb
-  
+
     if (opt.isError) initErrorInterceptor()
-  
+
     attachLoadEventListener()
-  
+
     if (opt.isResource || opt.isError) initAjaxInterceptor()
 
     return this
