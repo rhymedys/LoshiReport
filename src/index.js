@@ -2,7 +2,7 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-15 16:23:33
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-17 13:59:27
+ * @Last Modified time: 2018-08-21 14:31:17
  */
 let errorList = []
 let addData = {}
@@ -97,7 +97,7 @@ function injectListener2Ajax (funs) {
       try {
         type = typeof this.xhr[attr]
       } catch (e) {}
-      if (checkIsFunction(type)) {
+      if (type === 'function') {
         this[attr] = hookfun(attr)
       } else {
         Object.defineProperty(this, attr, {
@@ -169,7 +169,7 @@ function reportData () {
         headers: {
           'Content-Type': 'application/json'
         },
-        // type: 'report-data',
+        type: 'report-data',
         body: JSON.stringify(result)
       })
     }
@@ -305,7 +305,7 @@ function initAjaxInterceptor () {
     open (arg, xhr) {
       if (opt.filterUrl && opt.filterUrl.length) {
         let begin = false
-        opt.filterUrl.forEach(item => { if (arg[1].indexOf(item) != -1) begin = true })
+        opt.filterUrl.forEach(item => { if (arg[1].indexOf(item) !== -1) begin = true })
         if (begin) return
       }
 
