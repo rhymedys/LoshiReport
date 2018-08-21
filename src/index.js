@@ -2,7 +2,7 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-15 16:23:33
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-21 14:31:17
+ * @Last Modified time: 2018-08-21 16:34:29
  */
 let errorList = []
 let addData = {}
@@ -202,7 +202,8 @@ function ajaxResponse (xhr, type) {
   defaults.data = {
     resourceUrl: xhr.responseURL,
     text: xhr.statusText,
-    status: xhr.status
+    status: xhr.status,
+    payload: xhr.xhr.body
   }
   conf.errorList.push(defaults)
 }
@@ -301,6 +302,17 @@ function initAjaxInterceptor () {
           ajaxResponse(xhr)
         }
       }
+    },
+    send (data, xhr) {
+      let res = {}
+      if (data && data.length && data[0]) {
+        data[0].split('&').forEach(val => {
+          const valKV = val.split('=')
+          res[valKV[0]] = valKV[1] || ''
+        })
+      }
+
+      xhr.body = res
     },
     open (arg, xhr) {
       if (opt.filterUrl && opt.filterUrl.length) {
