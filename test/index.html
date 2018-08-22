@@ -4,15 +4,13 @@
 	<meta charset="UTF-8">
 	<title>loshiReport test</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-	<script src="../dist/loshi-report.0.0.1.js"></script>
+	<script src="../dist/loshi-report.0.0.1.js?123215456" ></script>
+	<script src="../dist/loshi-re.0.0.1.js?123215456" ></script>
 	<script>
         LoshiReport
           .init({
-            reportApi: 'http://some.com/api'
+            reportApi: 'http://localhost:7001/api'
           })
-          .addData((data) => {
-    				data.appId = 123215456
-		    })
 	</script>
 	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 </head>
@@ -33,13 +31,13 @@
 	</div>
 	<script>
 		$(function () {
-		  $.ajax({
-		    type: 'get',
-		    url: 'http://mock-api.seosiwei.com/guest/home/api/shop/getHomeInitInf',
-		    success: data => {
-		      // console.log(data)
-		    }
-		  })
+		  // $.ajax({
+		  //   type: 'get',
+		  //   url: 'http://mock-api.seosiwei.com/guest/home/api/shop/getHomeInitInf',
+		  //   success: data => {
+		  //     // console.log(data)
+		  //   }
+		  // })
 
 		  // fetch('http://mock-api.seosiwei.com/guest/order/api/order/getOrde',{
 		  // 	method: 'POST',
@@ -52,17 +50,17 @@
 		  // 	console.log('-----')
 		  // })
 
-		  $.ajax({
-		    type: 'post',
-		    url: 'http://127.0.0.1:7001.com/guest/order/api/order/getOrder',
-		    data: {
-		      a: '1',
-		      b: 2
-		    },
-		    success: data => {
-		      // console.log(data)
-		    }
-  })
+  // 	  $.ajax({
+  // 	    type: 'post',
+  // 	    url: 'http://127.0.0.1:7001.com/guest/order/api/order/getOrder',
+  // 	    data: {
+  // 	      a: '1',
+  // 	      b: 2
+  // 	    },
+  // 	    success: data => {
+  // 	      // console.log(data)
+  // 	    }
+  // })
 		})
 
 console.log(fafsdfsdfasfd)
