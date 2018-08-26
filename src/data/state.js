@@ -2,7 +2,7 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-23 15:15:14
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-26 16:32:44
+ * @Last Modified time: 2018-08-26 17:03:31
  */
 
 export default function () {
@@ -25,12 +25,6 @@ export default function () {
     haveAjax: false,
     // 是否有fetch
     haveFetch: false,
-    // 来自域名
-    preUrl: document.referrer && document.referrer !== window.location.href ? document.referrer : '',
-    // 浏览器信息
-    appVersion: navigator.appVersion,
-    // 当前页面
-    page: window.location.href,
 
     hadInitReport: false // 初始化汇报
   }

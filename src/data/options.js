@@ -2,8 +2,10 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-23 14:45:41
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-23 14:50:03
+ * @Last Modified time: 2018-08-26 16:56:20
  */
+
+let appId = null
 
 let opt = {
   // 上报地址
@@ -43,4 +45,30 @@ export function getOption (key) {
   let res = opt
   key && (res = opt[key])
   return res
+}
+
+/**
+ * @description 设置AppId
+ * @export
+ * @param {*} options
+ */
+export function setAppId (options) {
+  if (options && options.appId) {
+    appId = options.appId
+    delete options.appId
+  } else {
+    const scriptList = Array.from(document.getElementsByTagName('script'))
+    const reg = new RegExp(/loshi-report.*?js/)
+    const res = scriptList.find(val => reg.test(val.getAttribute('src')))
+    res && (appId = res.getAttribute('src').split('?')[1])
+  }
+}
+
+/**
+ * @description 获取AppId
+ * @export
+ * @returns
+ */
+export function getAppId () {
+  return appId
 }

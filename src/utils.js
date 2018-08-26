@@ -2,8 +2,9 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-23 14:28:48
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-23 17:05:25
+ * @Last Modified time: 2018-08-26 17:05:38
  */
+import {getAppId} from './data/options'
 
 function getPrototype (obj) {
   return Object.prototype.toString.call(obj)
@@ -11,31 +12,6 @@ function getPrototype (obj) {
 
 export function checkIsFunction (obj) {
   return getPrototype(obj) === '[object Function]'
-}
-
-export function checkIsObject (obj) {
-  return getPrototype(obj) === '[object Object]'
-}
-
-/**
- *
- * @export 获取AppId
- * @param {*} options 如果options中有，则提取options中的，否则从脚本src获取
- * @returns
- */
-export function getAppId (options) {
-  let appId = null
-  if (options && options.appId) {
-    appId = options.appId
-    delete options.appId
-  } else {
-    const scriptList = Array.from(document.getElementsByTagName('script'))
-    const reg = new RegExp(/loshi-report.*?js/)
-    const res = scriptList.find(val => reg.test(val.getAttribute('src')))
-    res && (appId = res.getAttribute('src').split('?')[1])
-  }
-
-  return appId
 }
 
 /**
@@ -98,4 +74,22 @@ export function getResourcePerformance (mapResourceCb) {
 
     return res
   })
+}
+
+/**
+ * @description 提交的表单数据
+ * @export
+ * @param {*} obj
+ * @returns
+ */
+export function generateCommonReportBody (obj) {
+  return Object.assign({
+    appId: getAppId(),
+    time: new Date().getTime(),
+    page: window.location.href, // 当前页面
+    preUrl: document.referrer && document.referrer !== window.location.href ? document.referrer : '', // 来自域名
+    appVersion: navigator.appVersion, // 浏览器信息
+    screenwidth: document.documentElement.clientWidth || document.body.clientWidth,
+    screenheight: document.documentElement.clientHeight || document.body.clientHeight
+  }, obj)
 }

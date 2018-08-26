@@ -2,17 +2,16 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-23 14:28:29
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-26 16:38:26
+ * @Last Modified time: 2018-08-26 17:10:07
  */
 import times from './data/time'
 import getOrgState from './data/state'
-import {checkIsFunction, getAppId,getPagePerformance,getResourcePerformance} from './utils'
-import {setOptions, getOption} from './data/options'
+import {getPagePerformance,getResourcePerformance,generateCommonReportBody} from './utils'
+import {setOptions, getOption,setAppId} from './data/options'
 import initErrorInterceptor from './interceptor/error'
 import initLoadEventInterceptor from './interceptor/loadEvent'
 import initAjaxInterceptor ,{getAjaxFeedbackObj}from './interceptor/ajax'
 
-let appId = null // 应1用Id
 let state = Object.assign({},getOrgState())
 
 function resetState2Def () {
@@ -20,7 +19,6 @@ function resetState2Def () {
     hadInitReport:state.hadInitReport
   })
 }
-
 
 // 比较onload与ajax时间长度
 function getLargeTime () {
@@ -111,18 +109,11 @@ function initLoadEventInterceptorCb () {
 
   setTimeout(()=>{
     resetState2Def()
-    const reportBody={
-      appId,
-      time:new Date().getTime(),
-      page:copyState.page,
-      preUrl:copyState.preUrl,
-      appVersion: copyState.appVersion,
+    const reportBody =generateCommonReportBody({
       errorList:copyState.errorList,
       performance:getOption('isPage') ?getPagePerformance():null,
       resourceList:getOption('isResource') ?getResourcePerformance(mapResourcePerformanceCb):null,
-      screenwidth: document.documentElement.clientWidth || document.body.clientWidth,
-      screenheight: document.documentElement.clientHeight || document.body.clientHeight
-    }
+    })
     reportData(reportBody,true)
   },getOption('outtime'))
   console.log('loadEvent', times)
@@ -143,8 +134,8 @@ function getInitAjaxInterceptorConfig () {
           if (xhr.status < 200 || xhr.status > 300) {
             xhr.method = xhr.args.method
             if(!state.hadInitReport){
-              state.errorList.push(getAjaxFeedbackObj(xhr))
-              }
+                state.errorList.push(getAjaxFeedbackObj(xhr))
+            }
             }
         }, 600)
       }
@@ -231,7 +222,7 @@ class Report {
     /* eslint no-proto: "error" */
     Object.freeze(window.LoshiReport.__proto__)
 
-    appId = getAppId(options)
+    setAppId(options)
 
     setOptions(options)
 
