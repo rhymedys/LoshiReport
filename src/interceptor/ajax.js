@@ -2,8 +2,27 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-23 17:12:27
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-23 18:30:03
+ * @Last Modified time: 2018-08-26 14:30:21
  */
+import defErrObj from '../constant/defErrObj'
+
+export function getAjaxFeedbackObj (xhr) {
+  return Object.assign(
+    {},
+    defErrObj,
+    {
+      t: new Date().getTime(),
+      n: 'ajax',
+      msg: xhr.statusText || 'ajax request error',
+      method: xhr.method,
+      data: {
+        resourceUrl: xhr.responseURL,
+        text: xhr.statusText,
+        status: xhr.status,
+        payload: xhr.xhr.body
+      }
+    })
+}
 
 export default function injectListener2Ajax (inject, funs) {
   if (!inject || !funs) return

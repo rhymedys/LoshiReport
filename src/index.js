@@ -2,17 +2,94 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-23 14:28:29
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-24 10:52:49
+ * @Last Modified time: 2018-08-26 16:38:26
  */
 import times from './data/time'
-import state from './data/state'
-import {checkIsFunction, getAppId} from './utils'
+import getOrgState from './data/state'
+import {checkIsFunction, getAppId,getPagePerformance,getResourcePerformance} from './utils'
 import {setOptions, getOption} from './data/options'
 import initErrorInterceptor from './interceptor/error'
 import initLoadEventInterceptor from './interceptor/loadEvent'
-import initAjaxInterceptor from './interceptor/ajax'
+import initAjaxInterceptor ,{getAjaxFeedbackObj}from './interceptor/ajax'
 
 let appId = null // 应1用Id
+let state = Object.assign({},getOrgState())
+
+function resetState2Def () {
+  state = Object.assign({},getOrgState(),{
+    hadInitReport:state.hadInitReport
+  })
+}
+
+
+// 比较onload与ajax时间长度
+function getLargeTime () {
+  const {loadTime,ajaxTime,fetchTime} = times
+  if (state.haveAjax && state.haveFetch && loadTime && ajaxTime && fetchTime) {
+    console.log(`loadTime:${loadTime},ajaxTime:${ajaxTime},fetchTime:${fetchTime}`)
+  } else if (state.haveAjax && !state.haveFetch && loadTime && ajaxTime) {
+    console.log(`loadTime:${loadTime},ajaxTime:${ajaxTime}`)
+  } else if (!state.haveAjax && state.haveFetch && loadTime && fetchTime) {
+    console.log(`loadTime:${loadTime},fetchTime:${fetchTime}`)
+  } else if (!state.haveAjax && !state.haveFetch && loadTime) {
+    console.log(`loadTime:${loadTime}`)
+  }
+}
+
+
+/**
+ * @description 发送报告
+ * @param {*} reportObj
+ * @param {*} initReport
+ */
+function reportData(reportObj,initReport){
+  if(window.fetch && reportObj){
+    console.log('reportObj',reportObj)
+    window.fetch(getOption().reportApi, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      type: 'report-data',
+      body: JSON.stringify(reportObj)
+    }).then(() => {
+      console.log('fetch then', state)
+    }).finally(()=>{
+      initReport && (state.hadInitReport = true)
+      console.log('fetch finally state',state)
+    })
+  }
+}
+
+
+function getAjaxTime (type) {
+  state.loadNum += 1
+  if (state.loadNum === state.ajaxLength) {
+    if (type === 'load') {
+      console.log('走了AJAX onload 方法')
+    } else if (type === 'readychange') {
+      console.log('走了AJAX onreadystatechange 方法')
+    } else {
+      console.log('走了 error 方法')
+    }
+    state.ajaxLength = state.loadNum = 0
+    times.ajaxTime = new Date().getTime() - times.beginTime
+    getLargeTime()
+  }
+}
+
+function mapResourcePerformanceCb(item){
+  if (state.ajaxMsg && state.ajaxMsg.length) {
+    for (let i = 0, len = state.ajaxMsg.length; i < len; i++) {
+      if (state.ajaxMsg[i].url === item.name) {
+        json.method = state.ajaxMsg[i].method || 'GET'
+        json.type = state.ajaxMsg[i].type || json.type
+      }
+    }
+  }
+}
+
 
 /**
  *  错误拦截回调
@@ -29,6 +106,25 @@ function initErrorInterceptorCb (errObj) {
  */
 function initLoadEventInterceptorCb () {
   times.loadTime = new Date().getTime() - times.beginTime
+  getLargeTime()
+  const copyState = Object.assign({},state)
+
+  setTimeout(()=>{
+    resetState2Def()
+    const reportBody={
+      appId,
+      time:new Date().getTime(),
+      page:copyState.page,
+      preUrl:copyState.preUrl,
+      appVersion: copyState.appVersion,
+      errorList:copyState.errorList,
+      performance:getOption('isPage') ?getPagePerformance():null,
+      resourceList:getOption('isResource') ?getResourcePerformance(mapResourcePerformanceCb):null,
+      screenwidth: document.documentElement.clientWidth || document.body.clientWidth,
+      screenheight: document.documentElement.clientHeight || document.body.clientHeight
+    }
+    reportData(reportBody,true)
+  },getOption('outtime'))
   console.log('loadEvent', times)
 }
 
@@ -42,25 +138,29 @@ function getInitAjaxInterceptorConfig () {
           if (state.goingType === 'load') return
           state.goingType = 'readychange'
 
-          // getAjaxTime('readychange')
+          getAjaxTime('readychange')
 
           if (xhr.status < 200 || xhr.status > 300) {
             xhr.method = xhr.args.method
-            // ajaxResponse(xhr)
-          }
+            if(!state.hadInitReport){
+              state.errorList.push(getAjaxFeedbackObj(xhr))
+              }
+            }
         }, 600)
       }
     },
     onerror (xhr) {
       console.log('onerror', xhr.readyState)
 
-      // getAjaxTime('error')
+      getAjaxTime('error')
       if (xhr.args) {
         xhr.method = xhr.args.method
         xhr.responseURL = xhr.args.url
         xhr.statusText = 'ajax request error'
       }
-      // ajaxResponse(xhr)
+      if(!state.hadInitReport){
+        state.errorList.push(getAjaxFeedbackObj(xhr))
+      }
     },
     onload (xhr) {
       console.log('onload', xhr.readyState)
@@ -68,10 +168,12 @@ function getInitAjaxInterceptorConfig () {
       if (xhr.readyState === 4) {
         if (state.goingType === 'readychange') return
         state.goingType = 'load'
-        // getAjaxTime('load')
+        getAjaxTime('load')
         if (xhr.status < 200 || xhr.status > 300) {
           xhr.method = xhr.args.method
-          // ajaxResponse(xhr)
+          if(!state.hadInitReport){
+            state.errorList.push(getAjaxFeedbackObj(xhr))
+          }
         }
       }
     },
@@ -97,15 +199,20 @@ function getInitAjaxInterceptorConfig () {
       let result = { url: arg[1], method: arg[0] || 'GET', type: 'xmlhttprequest' }
       this.args = result
 
-      // clearPerformance()
-      // conf.ajaxMsg.push(result)
-      // conf.ajaxLength = conf.ajaxLength + 1
-      // conf.haveAjax = true
+      if(!state.hadInitReport){
+        state.ajaxMsg.push(result) 
+        state.ajaxLength = state.ajaxLength + 1
+        state.haveAjax = true
+      }
     }
   }
 }
 
+
+
+
 class Report {
+
   /**
      * 初始化
      *
@@ -133,34 +240,7 @@ class Report {
     initErrorInterceptor(getOption().isError, initErrorInterceptorCb)
 
     initAjaxInterceptor(getOption().isError, getInitAjaxInterceptorConfig())
-    // if (opt.isResource || opt.isError) initAjaxInterceptor()
-
-    // return this
   }
-
-  //   addError (err) {
-  //     if (err) {
-  //       let errObj = {
-  //         method: 'GET',
-  //         msg: err.msg,
-  //         n: 'js',
-  //         data: {
-  //           col: err.col,
-  //           line: err.line,
-  //           resourceUrl: err.resourceUrl
-  //         }
-  //       }
-  //       errorList.push(errObj)
-  //     }
-
-  //     return this
-  //   }
-
-  //   addData (cb) {
-  //     checkIsFunction(cb) && cb(addData)
-
-//     return this
-//   }
 }
 
 export default new Report()
