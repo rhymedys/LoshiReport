@@ -33,8 +33,8 @@
 		$(function () {
 		  $.ajax({
 		    type: 'get',
-		    url: 'http://mock-api.seosiwei.com/guest/home/api/shop/getHomeInitInf',
-		    success: data => {
+		    url: 'http://127.0.0.1:7001/guest/home/api/shop/getHomeInitInf',
+		    success: function () {
 		      // console.log(data)
 		    }
 		  })
@@ -49,15 +49,28 @@
 		  // fetch(req).then(function(response){
 		  // 	console.log('-----')
 		  // })
-
-  	  $.ajax({
+		  setTimeout(function () {
+		    $.ajax({
   	    type: 'post',
-  	    url: 'http://127.0.0.1:7001.com/guest/order/api/order/getOrder',
+  	    url: 'http://127.0.0.1:7001/guest/order/api/order/getOrder',
   	    data: {
   	      a: '1',
   	      b: 2
   	    },
-  	    success: data => {
+  	    success: function () {
+  	      // console.log(data)
+  	    }
+ 		 })
+		  }, 10 * 1000)
+		
+  	  $.ajax({
+  	    type: 'post',
+  	    url: 'http://127.0.0.1:7001/guest/order/api/order/getOrder',
+  	    data: {
+  	      a: '1',
+  	      b: 2
+  	    },
+  	    success: function () {
   	      // console.log(data)
   	    }
  		 })

@@ -2,7 +2,7 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-23 15:15:14
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-26 17:03:31
+ * @Last Modified time: 2018-08-27 09:31:59
  */
 
 export default function () {
@@ -25,7 +25,9 @@ export default function () {
     haveAjax: false,
     // 是否有fetch
     haveFetch: false,
-
-    hadInitReport: false // 初始化汇报
+    // 初始化汇报
+    hadInitReport: false,
+    // 正在上传初始化报告
+    reportingInitData: false
   }
 }

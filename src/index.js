@@ -2,7 +2,7 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-23 14:28:29
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-26 17:11:50
+ * @Last Modified time: 2018-08-27 10:08:33
  */
 import times from './data/time'
 import getOrgState from './data/state'
@@ -42,6 +42,7 @@ function getLargeTime () {
 function reportData (reportObj, initReport) {
   if (window.fetch && reportObj) {
     console.log('reportObj', reportObj)
+    if (initReport) state.reportingInitData = true
     window.fetch(getOption().reportApi, {
       method: 'POST',
       mode: 'cors',
@@ -53,9 +54,26 @@ function reportData (reportObj, initReport) {
     }).then(() => {
       console.log('fetch then', state)
     }).finally(() => {
-      initReport && (state.hadInitReport = true)
+      if (initReport) {
+        state.hadInitReport = true
+        state.reportingInitData = false
+      }
       console.log('fetch finally state', state)
     })
+  }
+}
+
+/**
+ * 是否正在上传初始化报告或者已经上传完初始化报告
+ *
+ * @param {*} resolveCb 是___回调
+ * @param {*} rejectCb  否___回调
+ */
+function checkHadInitReportOrReportingInitData (resolveCb, rejectCb) {
+  if (state.reportingInitData || state.hadInitReport) {
+    resolveCb && resolveCb()
+  } else {
+    rejectCb && rejectCb()
   }
 }
 
@@ -92,7 +110,13 @@ function mapResourcePerformanceCb (item) {
  * @param {*} errObj
  */
 function initErrorInterceptorCb (errObj) {
-  state.errorList.push(errObj)
+  checkHadInitReportOrReportingInitData(() => {
+    reportData(generateCommonReportBody({
+      errorList: [errObj]
+    }))
+  }, () => {
+    state.errorList.push(errObj)
+  })
 }
 
 /**
@@ -117,55 +141,64 @@ function initLoadEventInterceptorCb () {
 }
 
 function getInitAjaxInterceptorConfig () {
+  function reportErrorOrPush2ErrorList (xhr) {
+    checkHadInitReportOrReportingInitData(() => {
+      reportData(generateCommonReportBody({
+        errorList: [getAjaxFeedbackObj(xhr)]
+      }))
+    }, () => {
+      state.errorList.push(getAjaxFeedbackObj(xhr))
+    })
+  }
+
   return {
     onreadystatechange (xhr) {
-      console.log('onreadystatechange', xhr.readyState)
+      console.log('onreadystatechangeCb', xhr.readyState)
       // 完成状态
       if (xhr.readyState === 4) {
         setTimeout(() => {
           if (state.goingType === 'load') return
           state.goingType = 'readychange'
-
-          getAjaxTime('readychange')
+          checkHadInitReportOrReportingInitData(null, () => {
+            getAjaxTime('readychange')
+          })
 
           if (xhr.status < 200 || xhr.status > 300) {
             xhr.method = xhr.args.method
-            if (!state.hadInitReport) {
-              state.errorList.push(getAjaxFeedbackObj(xhr))
-            }
+            reportErrorOrPush2ErrorList(xhr)
           }
         }, 600)
       }
     },
     onerror (xhr) {
-      console.log('onerror', xhr.readyState)
-
-      getAjaxTime('error')
+      console.log('onerrorCb', xhr.readyState)
+      checkHadInitReportOrReportingInitData(null, () => {
+        getAjaxTime('error')
+      })
       if (xhr.args) {
         xhr.method = xhr.args.method
         xhr.responseURL = xhr.args.url
         xhr.statusText = 'ajax request error'
       }
-      if (!state.hadInitReport) {
-        state.errorList.push(getAjaxFeedbackObj(xhr))
-      }
+      reportErrorOrPush2ErrorList(xhr)
     },
     onload (xhr) {
-      console.log('onload', xhr.readyState)
+      console.log('onloadCb', xhr.readyState)
 
       if (xhr.readyState === 4) {
         if (state.goingType === 'readychange') return
         state.goingType = 'load'
-        getAjaxTime('load')
+        checkHadInitReportOrReportingInitData(null, () => {
+          getAjaxTime('load')
+        })
         if (xhr.status < 200 || xhr.status > 300) {
           xhr.method = xhr.args.method
-          if (!state.hadInitReport) {
-            state.errorList.push(getAjaxFeedbackObj(xhr))
-          }
+          reportErrorOrPush2ErrorList(xhr)
         }
       }
     },
     send (data, xhr) {
+      console.log('sendCb')
       let res = {}
       if (data && data.length && data[0]) {
         data[0].split('&').forEach(val => {
@@ -177,6 +210,8 @@ function getInitAjaxInterceptorConfig () {
       xhr.body = res
     },
     open (arg, xhr) {
+      console.log('openCb')
+
       const filterUrl = getOption().filterUrl
       if (filterUrl && filterUrl.length) {
         let begin = false
@@ -186,12 +221,11 @@ function getInitAjaxInterceptorConfig () {
 
       let result = { url: arg[1], method: arg[0] || 'GET', type: 'xmlhttprequest' }
       this.args = result
-
-      if (!state.hadInitReport) {
+      checkHadInitReportOrReportingInitData(null, () => {
         state.ajaxMsg.push(result)
         state.ajaxLength = state.ajaxLength + 1
         state.haveAjax = true
-      }
+      })
     }
   }
 }
