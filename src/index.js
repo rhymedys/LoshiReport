@@ -2,11 +2,11 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-23 14:28:29
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-27 10:08:33
+ * @Last Modified time: 2018-08-28 14:50:35
  */
 import times from './data/time'
 import getOrgState from './data/state'
-import {getPagePerformance, getResourcePerformance, generateCommonReportBody} from './utils'
+import {getPagePerformance, getResourcePerformance, generateCommonReportBody, markCookies} from './utils'
 import {setOptions, getOption, setAppId} from './data/options'
 import initErrorInterceptor from './interceptor/error'
 import initLoadEventInterceptor from './interceptor/loadEvent'
@@ -252,6 +252,8 @@ class Report {
     setAppId(options)
 
     setOptions(options)
+
+    markCookies()
 
     initLoadEventInterceptor(true, initLoadEventInterceptorCb)
 

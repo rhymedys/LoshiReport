@@ -2,7 +2,7 @@
  * @Author: Rhymedys/Rhymedys@gmail.com
  * @Date: 2018-08-23 14:28:48
  * @Last Modified by: Rhymedys
- * @Last Modified time: 2018-08-26 17:05:38
+ * @Last Modified time: 2018-08-28 15:19:33
  */
 import {getAppId} from './data/options'
 
@@ -92,4 +92,21 @@ export function generateCommonReportBody (obj) {
     screenwidth: document.documentElement.clientWidth || document.body.clientWidth,
     screenheight: document.documentElement.clientHeight || document.body.clientHeight
   }, obj)
+}
+
+/**
+ * 做标记
+ *
+ * @export
+ */
+export function markCookies () {
+  try {
+    const cookieMatch = new RegExp(/`loshi_tj${getAppId()}`/g)
+
+    if (!cookieMatch.test(document.cookie)) {
+      document.cookie = `${document.cookie.trim().length ? `${document.cookie};` : ''}loshi_tj${getAppId()}=${new Date().getTime()}`
+    }
+  } catch (e) {
+    console.warn('初始化错误')
+  }
 }
